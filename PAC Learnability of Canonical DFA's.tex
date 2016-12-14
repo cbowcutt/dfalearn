@@ -1,0 +1,156 @@
+\documentclass[10pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\newcommand{\pushcode}[1][1]{\hskip\dimexpr#1\algorithmicindent\relax}
+\newcommand{\define}[2]{
+	\textbf{Definition}:\indent
+	#1
+	\newline
+	\newline\indent
+	#2
+}
+\newcommand{\defineb}[1]{
+	\textbf{Definition}:\indent
+	#1
+	\newline
+}
+\newcommand{\defnl}{
+\newline\indent\indent\indent\indent\indent
+}
+\newlength\myindent
+\setlength\myindent{2em}
+\newcommand\bindent{%
+  \begingroup
+  \setlength{\itemindent}{\myindent}
+  \addtolength{\algorithmicindent}{\myindent}
+}
+\newcommand\eindent{\endgroup}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\author{Christopher Bowcutt}
+\title{PAC Learnability of Canonical DFA's}
+\begin{document}
+\noindent
+\textbf{Deterministic Finite Automata}
+\newline
+\newline
+\defineb{
+\defnl $\Sigma$ is an alphabet 
+\defnl $\Sigma* = \{ \alpha | \alpha = \beta \gamma \}$ is the set of strings over $\Sigma$ 
+\defnl $(Q, \delta, \Sigma, q_0, F)$ is a DFA, where
+\defnl \indent $Q = \{q_0, q_1, ... , q_n \} $ is the set of states
+\defnl \indent $\Sigma$ is an alphabet of symbols
+\defnl \indent $q_0$ is the start state
+\defnl \indent $F \in Q$ is the set of accepting states
+}
+\newline
+\defineb{
+$L(A)$ is the set of strings accepted by a DFA A.
+}
+\newline Let $S^+ \subset \Sigma$ be a set of strings accepted by a DFA A.
+\newline Let $S^-$ be the set of strings rejected by a DFA A.
+\newpage
+\textbf{Equivalence Relations for DFA's}
+\newline
+\newline
+\defineb{
+A Myhill-Nerode equivalence on $\Sigma^*$ for a DFA
+$A = (Q, \delta, \Sigma, q_0, F)$
+}
+\defineb{
+Given a DFA $D$ and $a, b \in \Sigma*$: $a \cong b$ i.f.f. $\delta*(q_0, a) = \delta*(q_0, b)$, and it is called an equivalence relation  on $\Sigma*$
+}
+\newline
+\defineb{
+$[a]_{\cong} = \{ b\in A | a \cong b \}$ is called an equivalence class of A.
+}
+\newline
+\defineb{
+A partition $\pi$ of A is the set of equivalence classes where the union of the classes in $\pi$ is equal to A.
+}
+\newline
+A Quotient Automoton $A_\pi$ can be constructed by partitioning the states of A into equivalence classes, and then by replacing each state that belongs in an equivalence relation with a new state that represents the merged states of that equivalence class
+\newline
+\newline
+\defineb{ A Quotient Automaton is defined as $A_\pi = (Q_\pi, \Sigma, \delta_\pi, B(q_0, \pi), F_\pi$
+\defnl
+$Q_\pi = \{ B(q, \pi) | \ q \in Q \}$
+\defnl 
+$F_\pi = \{ B(q, \pi) | \ q \in F \}$
+\defnl
+$\delta_\pi: Q_\pi \rightarrow 2^{Q_\pi}$
+\newline
+\newline
+$\forall a \in \Sigma, \ \forall B(q_i, \pi), \ B(q_j, \pi) \in Q_\pi$, The transition function is defined as 
+\newline
+\defnl
+$\delta_\pi(B(q_i, \pi), a) =  B(q_j, \pi)$,
+\defnl \indent if $q_i, q_j \in Q$ and $\delta(q_i, a) = q_j$
+\newline
+A lattice is the set of all Quotient Automata obtained by merging the states of a DFA A.
+}
+\newpage
+\noindent
+\textbf{The Learning Setup}
+\newline
+\newline
+\newline
+We will say that $\{ (x_i, y_i) \}$ is consistent with a DFA A if $\forall (x_i, y_i):$
+\newline
+\newline \indent \indent \textbf{i)} $x_i \in S^+$ i.f.f. $y_i = 1$
+\newline \indent \indent \textbf{ii)} $x_i \in S^-$ i.f.f. $y_i = -1$
+\newline
+\newline
+Here is how the Parekh and Honavar define the learning environment:
+\begin{itemize}
+	\item The sample space is defined as $X = \Sigma^*$ 
+	\item A Concept $x \subset X$ is defined as  $x = \{ $x is a regular language $\}$
+	\item The concept class $C$ is the class of all DFA, where a concept $x$ corresponds with some DFA in $C$.
+	\item The target function is defined as $R:C \rightarrow \{-1, +1\}^*$
+\end{itemize}
+\indent
+\newline
+\indent
+I find this setup of a learning space interesting for two reasons. First, $R$ is a multiclass classifier. Second, while the concept is a regular language, the Concept Class is derived by mapping a concept to a DFA. This mapping is onto, but not one-to-one (\textbf{TODO:} explain this). However, if we were to restrict the mapping of regular languages to a canonical DFA, the relationship would be one-to-one.
+\newline
+\newline
+Inside this environment, the training data $D$ could be defined as:
+\newline\newline\indent
+$D = \{ (x_i, y_i): x_i \in \Sigma* \ and \ y_i \in \{-1, 1\} \}$, where $y_i = 1$ if $(x_i \in L(A))$
+\newline\newline
+\textbf{PAC Learnability}
+\newline
+\newline
+\indent
+Leonard Pitt, in his paper 'Inductive Inference, DFAs, and Computational Complexity defines the PAC-Identifiability of DFas as follows:
+\newline\newline\indent
+
+\textit{
+DFAs are PAC-identifiable iff there exists a (possibly randomized algorithm A such that on input of any parameters $\epsilon$ and $\delta$, for any DFA M of size n, for any number m, and for any probability distribution D on strings of $\Sigma*$ of length at most m, if A obtains labeled examples, M generated according to distribution D, then A produces a DFA M' such that, with probability at least $1-\delta$, the probability (with respect to distribution D) of the set $\{w:w \in L(M) \oplus L(M') \}$ is at most $\epsilon$. The run time of A (and hence the number of randomly generated examples obtained by A) is required to be polynomial in $n, m, \frac{1}{\epsilon}, \frac{1}{\delta}$, and $|\Sigma|$ 
+}
+\newline
+\newline
+\indent So, $ P[ |L(M) \oplus L(M')| > \epsilon ] \leq \frac{1}{\delta}$.
+\newpage
+\textbf{RPNI}
+\begin{algorithm}
+\caption{RPNI}
+	\begin{algorithmic}
+	\STATE Input: $D = (\{x_i, y_i\})$
+	\STATE $\pi = \pi_0 = \{\{0\}, ... , \{\bar{N} - 1 \}\}$
+		\STATE FOR $i = 1 ..\bar{N} - 1$
+			\STATE \indent FOR $j = 0 ..i - 1$
+				\STATE \indent \indent $\tilde{\pi} = \pi \backslash  \{ \{B(i, \pi), B(j, \pi) \} \cup \{ \{B(i, \pi), B(j, \pi) \} $				
+				\STATE \indent \indent $M_{\tilde{\pi}} = derive(M, \pi)$
+				\STATE \indent \indent $\hat{\pi} = \ deterministicMerge(M, \tilde{\pi})$
+				\STATE \indent \indent if $consistent(M_{\hat{\pi}}), S^-)$
+				\STATE then
+					\STATE \indent \indent \indent $M_{\pi} = M_{\hat{\pi}}$
+					\STATE \indent \indent \indent $\pi = \hat{\pi}$	
+					\STATE \indent \indent \indent break
+	\STATE return $M_\pi$
+	\end{algorithmic}
+\end{algorithm}
+\end{document}
